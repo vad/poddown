@@ -4,9 +4,9 @@ from sqlalchemy import Table, Column, Integer, String, Date, \
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-def get_engine():
+def get_engine(fn):
     from sqlalchemy import create_engine
-    return create_engine('sqlite:///prova.sqlite')#, echo=True)
+    return create_engine('sqlite:///%s' % (fn,))#, echo=True)
 
 Base = declarative_base()
 class Entry(Base):
@@ -35,9 +35,9 @@ class Entry(Base):
     def __repr__(self):
         return "<Entry('%s')>" % (self.url,)
 
-def get_table():
+def get_table(fn):
     metadata = Entry.metadata
-    metadata.bind = get_engine()
+    metadata.bind = get_engine(fn)
     metadata.create_all()
 
     Session = sessionmaker(bind=metadata.bind)

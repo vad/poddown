@@ -58,10 +58,13 @@ class Podcast(object):
                     self._path,)
         for entry in session.query(Entry).filter(
             Entry.podcast == self._name).filter(Entry.status == 0).all():
+            ##TODO: print only in verbose mode
             url = entry.url
             title = entry.title
+            print 'downloading', title
             path = os.path.join(self._path, title+".mp3")
             try:
+                ##TODO: manage 404
                 urlretrieve(url, path)
 
                 entry.status = 1
@@ -79,7 +82,7 @@ def main():
     cp = ConfigParser()
     cp.read("poddown.cfg")
 
-    Entry, Session = get_table()
+    _, Session = get_table(cp.get('poddown', 'database'))
     path = cp.get('poddown', 'path')
     for section in (section for section in cp.sections() if
                     section not in ('poddown',)):
