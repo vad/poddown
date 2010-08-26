@@ -47,9 +47,15 @@ class Podcast(object):
         from urllib import urlretrieve, ContentTooShortError
         session = self.Session()
 
-        ##TODO: status
-        ##TODO: mkdir
         ##TODO: manage formats different from mp3
+
+        try:
+            os.makedirs(self._path) ## check if exists
+        except OSError:
+            if not (os.path.exists(self._path) and os.path.isdir(self._path)):
+                ## TODO: exit in a more elegant manner
+                raise OSError, "%s or one of his parent is not a directory" % (
+                    self._path,)
         for entry in session.query(Entry).filter(
             Entry.podcast == self._name).filter(Entry.status == 0).all():
             url = entry.url
