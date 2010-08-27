@@ -76,11 +76,38 @@ class Podcast(object):
                 print 'Can not connect to the server of podcast', entry.podcast
 
 
+def get_option_parser():
+    from optparse import OptionParser
+    op = OptionParser('%prog [options]')
+    op.add_option('-c', '--config', action="store", dest="config",
+                  default=None, metavar="FILE",
+                  help="Configuration file")
+
+    return op
+
+def get_config_filename(options):
+    if options.config is None:
+        try:
+            home = os.environ['HOME']
+        except KeyError:
+            raise Exception, 'You need to specify the configuration file'
+        config_file = os.path.join(home, '.poddown.cfg')
+    else:
+        config_file = options.config
+
+    if not (os.path.exists(config_file) and os.path.isfile(config_file)):
+        raise Exception, 'Bad configuration file %s' % (config_file,)
+    return config_file
+
 def main():
     from ConfigParser import ConfigParser
+    op = get_option_parser()
+    options, _ = op.parse_args()
+
+    config_file = get_config_filename(options)
 
     cp = ConfigParser()
-    cp.read("poddown.cfg")
+    cp.read(config_file)
 
     _, Session = get_table(cp.get('poddown', 'database'))
     path = cp.get('poddown', 'path')
